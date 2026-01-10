@@ -1,0 +1,1 @@
+curl http://localhost:30001/v1/policies/aggregated-by-user

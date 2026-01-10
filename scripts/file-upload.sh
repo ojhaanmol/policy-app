@@ -1,0 +1,1 @@
+curl -X POST http://localhost:30001/v1/policies/upload   -F "file=@<path-to-the-project>/INSUREDIME/assets/data-sheet-Node-js-Assesment.csv"
