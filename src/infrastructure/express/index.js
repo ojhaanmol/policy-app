@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-function createApp({policyController}) {
+function createApp({policyController, scheduleMessageController}) {
 
     const app = express();
 
@@ -38,6 +38,13 @@ function createApp({policyController}) {
         upload.single('file'),
         policyController.uploadPolicyDocument.bind(policyController)
     );
+
+    app.post(
+        '/v1/messages/schedule',
+        express.json(),
+        scheduleMessageController.schedule.bind(scheduleMessageController)
+    );
+
 
     app.get('/health', (_, res) => {
         res.json({ status: 'ok' });

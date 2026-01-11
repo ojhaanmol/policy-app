@@ -18,20 +18,45 @@ const {
     WorkerThreadCsvIngestion
 } = require('../interfaces-adapters/gateways/worker_threads/uploadPolicyDocument');
 
+const { ScheduleMessageController } =
+    require('../interfaces-adapters/controllers/message');
+
 const User = require('./mongodb/models/User');
 const PolicyModel = require('./mongodb/models/Policy');
+const Message = require('./mongodb/models/Message');
+
+const { startInMemoryToMongoWorker } =
+    require('./inMemory/inMemoryToMongoWorker');
+
+const { InMemoryMessagePool } = require('./inMemory/messagePool');
+
+const { InMemoryPushDataGateway } = require('../interfaces-adapters/gateways/database/inMemory/pushDataGateway');
+
+
+
 
 async function startServer() {
     try {
-
+        
         await connectDb();
+        
+        const messagePool = new InMemoryMessagePool();
+        
+        const pushDataGateway = new InMemoryPushDataGateway({
+            messagePool
+        });
 
+        startInMemoryToMongoWorker({
+            messagePool,
+            MessageModel: Message
+        })
+        
         const getPolicyByUserNameGateway =
-            new MongoGetPolicyByUserNameGateway({
-                UserModel: User,
-                PolicyModel
-            });
-
+        new MongoGetPolicyByUserNameGateway({
+            UserModel: User,
+            PolicyModel
+        });
+        
         const policiesAggregatedByUserGateway =
             new MongoPoliciesAggregatedByUserGateway({
                 PolicyModel
@@ -47,8 +72,12 @@ async function startServer() {
             policiesAggregatedByUserGateway: ()=>policiesAggregatedByUserGateway.execute(),
             csvIngestionWorker
         });
-        
-        const app = createApp({policyController});
+
+        const scheduleMessageController= new ScheduleMessageController({
+            processData: pushDataGateway.processData.bind( pushDataGateway )
+        });
+
+        const app = createApp({policyController, scheduleMessageController});
 
         const PORT = process.env.PORT || 3000;
 
