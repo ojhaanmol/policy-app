@@ -8,8 +8,17 @@ class PushDataToPool{
     }
 
     async execute( data ){
-
-        await this.processDataWrapper( new DataEntity(data) )
+        let parsed
+        try {
+            parsed=  new DataEntity(data);
+        } catch (error) {
+            throw new PushDataToPoolError(
+                'PUSH DATA TO POOL ERROR:'+ error.message,
+                'PDP',
+                error
+            )
+        }
+        await this.processDataWrapper(parsed)
         
     }
 

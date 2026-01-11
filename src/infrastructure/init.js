@@ -32,8 +32,9 @@ const { InMemoryMessagePool } = require('./inMemory/messagePool');
 
 const { InMemoryPushDataGateway } = require('../interfaces-adapters/gateways/database/inMemory/pushDataGateway');
 
+const { startCpuGuard } = require("./pidusage/cpuGuard");
 
-
+startCpuGuard();
 
 async function startServer() {
     try {

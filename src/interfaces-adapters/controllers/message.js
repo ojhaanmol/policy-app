@@ -39,7 +39,7 @@ class ScheduleMessageController {
                 time
             })
 
-        } catch (error) {console.error(error.cause)
+        } catch (error) {
 
             if(error instanceof PushDataToPoolError)
                 response

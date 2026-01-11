@@ -43,7 +43,8 @@ async function processCsv(filePath) {
             userId: user._id
         });
 
-    } catch (err) {console.error(err)
+    } catch (err) {
+        console.error(err)
         stream.destroy();
     }
 
